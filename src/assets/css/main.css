@@ -1,0 +1,23 @@
+span {
+    color: red;
+}
+
+.form-order {
+    background: #fff;
+    padding-bottom: 25px;
+}
+
+.detail-order {
+    padding: 20px;
+    border-bottom: 1px solid rgb(223, 223, 223);
+}
+
+.product {
+    padding: 20px;
+    margin-bottom: 25px;
+    border-bottom: 1px solid rgb(223, 223, 223);
+}
+
+p.title-total {
+    font-weight: bold;
+}
