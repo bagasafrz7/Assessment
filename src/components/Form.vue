@@ -17,7 +17,7 @@
                       <label for="exampleInputEmail1"
                         >Name <span>*</span></label
                       >
-                      <b-form-select v-model="selected" class="mb-3">
+                      <b-form-select v-model="selectedName">
                         <b-form-select-option :value="null" disabled
                           >Please select an option</b-form-select-option
                         >
@@ -34,12 +34,17 @@
                       <label for="exampleInputEmail1"
                         >Distribution Center <span>*</span></label
                       >
-                      <select class="custom-select">
-                        <option selected disabled>Choose a Place</option>
-                        <!-- <option disabled>No Data Available</option> -->
-                        <option value="DC Tangerang">DC Tangerang</option>
-                        <option value="DC Cikarang">DC Cikarang</option>
-                      </select>
+                      <b-form-select v-model="selectedPlace">
+                        <b-form-select-option :value="null" disabled
+                          >Choose a Place</b-form-select-option
+                        >
+                        <b-form-select-option value="DC Tangerang"
+                          >DC Tangerang</b-form-select-option
+                        >
+                        <b-form-select-option value="DC Cikarang"
+                          >DC Cikarang</b-form-select-option
+                        >
+                      </b-form-select>
                     </div>
                     <b-row>
                       <b-col cols="6">
@@ -47,8 +52,13 @@
                           <label for="exampleInputEmail1"
                             >Payment Type <span>*</span></label
                           >
-                          <select class="custom-select">
-                            <option selected disabled>Choose a Payment</option>
+                          <select
+                            class="custom-select"
+                            v-model="selectedPayment"
+                          >
+                            <option selected disabled :value="null">
+                              Choose a Payment
+                            </option>
                             <option value="Cash H+1">Cash H+1</option>
                             <option value="Cash H+3">Cash H+3</option>
                             <option value="Cash H+7">CashH+7</option>
@@ -66,6 +76,7 @@
                           <b-form-datepicker
                             id="example-i18n-picker"
                             :min="new Date().toISOString().substr(0, 10)"
+                            v-model="datePicker"
                           ></b-form-datepicker>
                         </div>
                       </b-col>
@@ -95,19 +106,18 @@
                           <div class="form-group">
                             <label for="exampleInputEmail1"
                               >Product <span>*</span></label
-                            >
-                            <select class="custom-select">
-                              <option selected disabled>
-                                Choose a Product
-                              </option>
-                              <option
+                            ><b-form-select v-model="selectedProduct">
+                              <b-form-select-option :value="null" disabled
+                                >Choose a Product</b-form-select-option
+                              >
+                              <b-form-select-option
                                 v-for="(item, index) in firstInputOptions"
                                 :key="index"
                                 :value="index"
                               >
                                 {{ item }}
-                              </option>
-                            </select>
+                              </b-form-select-option>
+                            </b-form-select>
                           </div>
                         </b-col>
                         <b-col cols="4">
@@ -117,9 +127,11 @@
                             >
                             <select
                               class="custom-select"
-                              @change="changePrice($event)"
+                              v-model="selectedUnit"
                             >
-                              <option selected disabled>Choose a Unit</option>
+                              <option selected disabled :value="null">
+                                Choose a Unit
+                              </option>
                               <option
                                 value="Karton"
                                 v-for="(item, index) in secondInputOptions"
@@ -169,7 +181,7 @@
                               type="number"
                               class="form-control"
                               id="exampleInputPassword1"
-                              v-model="form.totals"
+                              :value="form.totals"
                               name="total"
                               disabled
                             />
@@ -341,7 +353,12 @@
                   </b-col>
                 </b-row>
               </div>
-              <b-button squared variant="success" class="float-right mr-4"
+              <b-button
+                squared
+                variant="success"
+                class="float-right mr-4"
+                v-bind:disabled="isDisable()"
+                type="submit"
                 >CONFIRM</b-button
               >
               <b-button
@@ -365,8 +382,16 @@ import { mapGetters, mapActions } from 'vuex'
 export default {
   data() {
     return {
-      selected: null,
+      selectedName: null,
+      selectedPlace: null,
+      selectedPayment: null,
+      datePicker: null,
       text: '',
+      selectedProduct: null,
+      selectedUnit: null,
+      qty: '',
+      price: '',
+      totals: '',
       options: [
         { value: null, text: 'Please select an option' },
         { value: 'a', text: 'This is First option' }
@@ -375,6 +400,7 @@ export default {
       dataProduct: [],
       items: [],
       firstInputOptions: [
+        '___________________________________',
         'Greenfields Full Cream Milk 1L',
         'Le Minerale 600ml',
         'Morning Dew Milk'
@@ -388,7 +414,8 @@ export default {
         price1: 0,
         totals1: 0,
         subTotal: 0
-      }
+      },
+      email: 'bagasafrz16@gmail.com'
     }
   },
   computed: {
@@ -411,6 +438,7 @@ export default {
       this.form.qty = event.target.value
       this.form.totals = this.form.qty * this.form.price
       this.form.subTotal = this.form.totals + this.form.totals1
+      // console.log(this.form.qty.length)
     },
     updatePrice(event) {
       this.form.price = event.target.value
@@ -426,6 +454,33 @@ export default {
       this.form.price1 = event.target.value
       this.form.totals1 = this.form.qty1 * this.form.price1
       this.form.subTotal = this.form.totals + this.form.totals1
+    },
+    isDisable() {
+      if (this.email < 1) {
+        return this.email < 1
+      } else if (this.selectedName < 1) {
+        return this.selectedName < 1
+      } else if (this.selectedPlace < 1) {
+        return this.selectedPlace < 1
+      } else if (this.selectedPayment < 1) {
+        return this.selectedPayment < 1
+      } else if (this.datePicker < 1) {
+        return this.datePicker < 1
+      } else if (this.text < 1) {
+        return this.text < 1
+      } else if (this.selectedProduct < 1) {
+        return this.selectedProduct < 1
+      } else if (this.selectedUnit < 1) {
+        return this.selectedUnit < 1
+      } else if (this.form.qty.length < 1) {
+        return this.form.qty < 1
+      } else if (this.form.price.length < 2) {
+        return this.form.price < 2
+      } else if (this.form.qty1.length < 1) {
+        return this.form.qty1 < 1
+      } else if (this.form.price1.length < 2) {
+        return this.form.price1 < 2
+      }
     }
   }
 }
